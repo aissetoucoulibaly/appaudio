@@ -2,18 +2,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AppState } from 'react-native';
 import { approvalVersion, stories } from '../content/stories';
+import { defaultSettings, normalizeSettings, type Settings } from '../content/personalization';
 
 const KEY = 'petites-aventures:library:v1';
-type Saved = { approvals: Record<string, number>; favorites: string[] };
+type Saved = { approvals: Record<string, number>; favorites: string[]; settings: Settings };
 type Library = Saved & {
   loaded: boolean; storageError: boolean; parentUntil: number;
   unlock: () => void; lock: () => void;
   approve: (id: string) => Promise<boolean>;
   toggleFavorite: (id: string) => void;
   reset: () => Promise<boolean>;
+  saveSettings: (settings: Settings) => Promise<boolean>;
+  chooseFriends: (names: string[]) => void;
 };
 const Context = createContext<Library | null>(null);
-const empty: Saved = { approvals: {}, favorites: [] };
+const empty: Saved = { approvals: {}, favorites: [], settings: defaultSettings };
 
 export function LibraryProvider({ children }: { children: ReactNode }) {
   const [saved, setSaved] = useState<Saved>(empty);
@@ -35,6 +38,7 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
       if (!data || typeof data !== 'object') throw new Error('Invalid library');
       const value = data as Partial<Saved>;
       const next: Saved = {
+        settings: normalizeSettings(value.settings),
         approvals: Object.fromEntries(stories.filter(s => value.approvals?.[s.id] === approvalVersion).map(s => [s.id, approvalVersion])),
         favorites: Array.isArray(value.favorites) ? value.favorites.filter(id => stories.some(s => s.id === id)) : [],
       };
@@ -66,6 +70,14 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
     toggleFavorite: id => {
       if (!stories.some(s => s.id === id)) return;
       void persist({ ...ref.current, favorites: ref.current.favorites.includes(id) ? ref.current.favorites.filter(x => x !== id) : [...ref.current.favorites, id] });
+    },
+    saveSettings: async settings => {
+      if (Date.now() >= parentUntil) return false;
+      return persist({ ...ref.current, settings: normalizeSettings(settings), approvals: {} });
+    },
+    chooseFriends: names => {
+      const settings = { ...ref.current.settings, selectedFriends: names.filter(n => ref.current.settings.friends.includes(n)) };
+      void persist({ ...ref.current, settings, approvals: {} });
     },
     reset: () => persist(empty),
   }}>{children}</Context.Provider>;

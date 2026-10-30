@@ -1,8 +1,16 @@
 # Les petites aventures — alpha familiale
 
-Application Expo pour un premier essai accompagné, à 4 ans. Deux histoires originales intégrées (pompiers et police), personnages récurrents, texte complet, autorisation parentale avant narration, favoris locaux et voix du téléphone.
+Application Expo pour un essai accompagné, à 4 ans. Deux histoires originales intégrées (pompiers et police), personnages récurrents, prénom du héros, jusqu’à trois amis facultatifs, ambiance musicale originale réglable, voix françaises de l’appareil et autorisation parentale avant narration.
 
-**Cette version ne génère pas encore d’histoires par IA.** Aucun compte, abonnement, clé API, prénom réel ou service analytique. Aucun envoi applicatif de récit à un fournisseur ; la synthèse vocale dépend des services système et de leurs réglages.
+**Cette version ne génère pas encore d’histoires par IA.** Les deux trames sont adaptées localement : le prénom remplace le personnage principal et les amis choisis participent à une introduction et une conclusion communes. Aucun compte, abonnement, clé API ou service analytique. Les prénoms restent dans le stockage local de l’app (non chiffré par l’application). Aucun envoi applicatif de récit à un fournisseur ; la synthèse vocale dépend des services système et de leurs réglages. Effacer les choix dans l’espace parent efface aussi les prénoms.
+
+## Personnalisation et son
+
+Dans **Espace parent**, enregistrer le prénom et les amis (séparés par des virgules), choisir une voix française disponible, essayer la prononciation, régler ou désactiver la musique. Dans un récit, choisir les amis qui participent, ou « Sans les amis ». Toute modification du texte annule l’autorisation précédente. Relire le texte personnalisé avant de l’autoriser.
+
+La musique est une nappe harmonique synthétisée originale de 24 secondes en boucle. Aucun échantillon tiers. Source reproductible : `python scripts/make-ambience.py`. Elle s’arrête avec la voix. Mélange voix/musique à vérifier sur le véritable iPhone, ainsi que les interruptions. Aucun accès au microphone n’est demandé par le projet.
+
+Le budget de 5 € (ou 10 € maximum) est pour l’instant une préférence locale pour le futur service. **Ce n’est pas un contrôle de facturation serveur.** Aucun appel payant n’est effectué. L’activation future exigera des tarifs vérifiés, une réservation de budget atomique côté serveur, un plafond fournisseur, un consentement au transfert des prénoms et un stockage audio permettant la réécoute sans resynthèse.
 
 ## Démarrer
 
@@ -25,10 +33,10 @@ Le mode web sert à inspecter le parcours et peut utiliser la synthèse vocale d
 
 1. Choisir un récit, lire le texte en entier.
 2. Résoudre le calcul parental et autoriser le récit.
-3. Lancer la lecture, essayer pause et reprise. La reprise recommence au début du paragraphe.
+3. Lancer la lecture, essayer pause et reprise, vérifier que musique et voix s’arrêtent ensemble. La reprise recommence au début du paragraphe.
 4. Tester les favoris, fermer et rouvrir l’app : favoris et autorisations doivent rester.
 5. Quitter l’application : la voix s’arrête et l’espace parent se verrouille.
-6. Depuis l’espace parent, effacer les choix locaux et vérifier qu’une nouvelle autorisation est nécessaire.
+6. Depuis l’espace parent, effacer les choix locaux et vérifier qu’une nouvelle autorisation est nécessaire et que les prénoms ont été effacés.
 
 Sur iPhone, désactiver le mode silencieux et vérifier le volume. Les voix disponibles et leur qualité dépendent du système ; des ressources vocales peuvent devoir être téléchargées. La durée affichée est estimée et non mesurée sur un fichier.
 

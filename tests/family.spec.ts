@@ -10,6 +10,14 @@ async function unlock(page: Page) {
 
 test('review required before speech; approval persists after reload', async ({ page }) => {
   await page.addInitScript(() => {
+    HTMLMediaElement.prototype.play = function () {
+      document.documentElement.dataset.music = 'playing';
+      document.documentElement.dataset.musicVolume = String(this.volume);
+      return Promise.resolve();
+    };
+    HTMLMediaElement.prototype.pause = function () {
+      document.documentElement.dataset.music = 'paused';
+    };
     Object.defineProperty(window.speechSynthesis, 'speak', { value: (utterance: SpeechSynthesisUtterance) => {
       document.documentElement.dataset.spoken = utterance.text;
     } });
@@ -27,8 +35,11 @@ test('review required before speech; approval persists after reload', async ({ p
   await page.getByRole('button', { name: 'J’ai lu ce récit et j’autorise son écoute' }).click();
   await page.getByRole('button', { name: 'Écouter l’histoire' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-spoken', /Au village des Tilleuls/);
+  await expect(page.locator('html')).toHaveAttribute('data-music', 'playing');
+  await expect(page.locator('html')).toHaveAttribute('data-music-volume', '0.12');
   await page.getByRole('button', { name: 'Mettre en pause' }).click();
   await expect(page.getByRole('button', { name: 'Écouter l’histoire' })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('data-music', 'paused');
   await page.reload();
   await expect(page.getByRole('button', { name: 'Écouter l’histoire' })).toBeVisible();
 });
@@ -63,4 +74,29 @@ test('universe filters do not expose the wrong story', async ({ page }) => {
   await page.getByRole('button', { name: '🚓 Police' }).click();
   await expect(page.getByText('Le mystère du doudou bleu', { exact: true })).toBeVisible();
   await expect(page.getByText('Éclair et la petite lumière', { exact: true })).toHaveCount(0);
+});
+
+test('parent configures names; choosing a friend revokes approval and persists the cast', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Espace parent', exact: true }).click();
+  await unlock(page);
+  await page.getByRole('textbox', { name: 'Prénom du héros' }).fill('Hugo');
+  await page.getByRole('textbox', { name: 'Prénoms des amis' }).fill('Zoé, Adam');
+  await page.getByRole('button', { name: 'Enregistrer la personnalisation' }).click();
+  await expect(page.getByText('Personnalisation enregistrée. Relisez et autorisez les récits modifiés.')).toBeVisible();
+  await page.getByRole('button', { name: 'Bibliothèque' }).click();
+  await page.getByRole('button', { name: 'Lire ensemble avant l’écoute' }).first().click();
+  await expect(page.getByText('Avec Hugo', { exact: true })).toBeVisible();
+  await expect(page.getByText(/Hugo, un enfant du village/)).toBeVisible();
+  await page.getByRole('button', { name: 'J’ai lu ce récit et j’autorise son écoute' }).click();
+  await expect(page.getByRole('button', { name: 'Écouter l’histoire' })).toBeVisible();
+  await page.getByRole('button', { name: 'Zoé', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Écouter l’histoire' })).toHaveCount(0);
+  await expect(page.getByText(/Aujourd’hui, Hugo retrouve Zoé/)).toBeVisible();
+  await expect(page.getByText(/Hugo et Zoé se retrouvent avec leurs parents/)).toBeVisible();
+  await page.reload();
+  await expect(page.getByText(/Aujourd’hui, Hugo retrouve Zoé/)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Écouter l’histoire' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Sans les amis', exact: true }).click();
+  await expect(page.getByText(/Aujourd’hui, Hugo retrouve Zoé/)).toHaveCount(0);
 });

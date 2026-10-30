@@ -27,6 +27,6 @@ export default function Home() {
       <Button secondary title={library.favorites.includes(story.id) ? '♥ Retirer des favoris' : '♡ Garder dans les favoris'} onPress={() => library.toggleFavorite(story.id)} />
     </Card>)}
     {library.loaded && visible.length === 0 && <Text style={styles.muted}>Vos histoires favorites apparaîtront ici.</Text>}
-    <Text style={styles.muted}>Deux histoires intégrées, sans génération IA ni compte. La durée est une estimation. Lecture par la voix du téléphone : gardez l’app ouverte pour ce premier essai.</Text>
+    <Text style={styles.muted}>Deux histoires personnalisables dans l’espace parent, sans génération IA ni compte. La durée est une estimation. Lecture par la voix du téléphone : gardez l’app ouverte pour ce premier essai.</Text>
   </Page>;
 }

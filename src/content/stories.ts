@@ -40,6 +40,6 @@ export const stories: Story[] = [
   },
 ];
 
-export const approvalVersion = 1;
+export const approvalVersion = 2;
 export const words = (story: Story) => story.paragraphs.join(' ').split(/\s+/).length;
 export const estimatedMinutes = (story: Story) => Math.max(1, Math.round(words(story) / 115));
