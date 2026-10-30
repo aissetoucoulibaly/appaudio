@@ -1,6 +1,6 @@
 export type Universe = 'fire' | 'police';
 export type Story = {
-  id: string; universe: Universe; title: string; subtitle: string;
+  fixedCast?: boolean; id: string; universe: Universe; title: string; subtitle: string;
   icon: string; paragraphs: string[];
 };
 

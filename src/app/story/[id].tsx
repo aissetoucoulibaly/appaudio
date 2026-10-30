@@ -3,7 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { setAudioModeAsync, setIsAudioActiveAsync, useAudioPlayer } from 'expo-audio';
 import { AppState, Text } from 'react-native';
-import { approvalVersion, stories } from '../../content/stories';
+import { approvalVersion } from '../../content/stories';
 import { ParentGate } from '../../components/ParentGate';
 import { Button, Card, Page, styles } from '../../components/ui';
 import { useLibrary } from '../../state/Library';
@@ -12,8 +12,8 @@ import { personalize } from '../../content/personalization';
 export default function StoryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const library = useLibrary();
-  const baseStory = stories.find(s => s.id === id);
-  const story = baseStory ? personalize(baseStory, library.settings) : undefined;
+  const baseStory = library.allStories.find(s => s.id === id);
+  const story = baseStory ? baseStory.fixedCast ? baseStory : personalize(baseStory, library.settings) : undefined;
   const music = useAudioPlayer(require('../../../assets/tilleuls-ambience.wav'), { keepAudioSessionActive: true });
   const [position, setPosition] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -76,7 +76,7 @@ export default function StoryScreen() {
     <Button secondary title="← Bibliothèque" onPress={() => { stop(); router.back(); }} />
     <Text style={{ fontSize: 48 }} accessibilityElementsHidden>{story.icon}</Text>
     <Text style={styles.title}>{story.title}</Text><Text style={styles.text}>{story.subtitle}</Text>
-    {!!library.settings.hero && <Card>
+    {!!library.settings.hero && !story.fixedCast && <Card>
       <Text style={styles.heading}>Avec {library.settings.hero}</Text>
       <Text style={styles.muted}>Qui vient dans cette aventure ? Chaque changement nécessite une nouvelle relecture.</Text>
       <Button secondary={library.settings.selectedFriends.length > 0} title="Sans les amis" onPress={() => { stop(); setPosition(0); library.chooseFriends([]); }} />
@@ -94,11 +94,13 @@ export default function StoryScreen() {
       <Text style={styles.muted}>La reprise recommence au début du passage. Gardez cette page ouverte ; quitter l’app arrête la voix. Sur iPhone, vérifiez le mode silencieux.</Text>
       {!!error && <Text accessibilityRole="alert" style={styles.muted}>{error}</Text>}
     </Card> : <Card><Text style={styles.heading}>D’abord, une lecture par le parent</Text><Text style={styles.text}>Lisez le texte ci-dessous. L’autorisation d’écoute se trouve après la dernière phrase.</Text></Card>}
+    {story.fixedCast && <Text style={styles.muted}>Histoire créée pour les participants choisis au moment de sa préparation.</Text>}
     <Text style={styles.heading}>Le récit complet</Text>
     {story.paragraphs.map((paragraph, i) => <Text key={i} style={styles.paragraph}>{paragraph}</Text>)}
     {!approved && library.loaded && <ParentGate>
       <Button title="J’ai lu ce récit et j’autorise son écoute" onPress={() => { void library.approve(story.id).then(ok => { if (!ok) setError('Autorisation non enregistrée. Rouvrez l’espace parent et réessayez.'); }); }} />
     </ParentGate>}
+    {story.fixedCast && <ParentGate><Button secondary title="Supprimer de cet appareil" onPress={() => { stop(); library.deleteStory(story.id); router.replace('/'); }} /></ParentGate>}
     {!approved && !!error && <Text accessibilityRole="alert" style={styles.muted}>{error}</Text>}
   </Page>;
 }

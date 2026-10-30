@@ -36,9 +36,9 @@ export function FamilySettings() {
     <View style={styles.row}><Button secondary={!draft.music} title="Avec musique" onPress={() => setDraft({ ...draft, music: true })} /><Button secondary={draft.music} title="Sans musique" onPress={() => setDraft({ ...draft, music: false })} /></View>
     <View style={styles.row}>{([0.06, 0.12, 0.2] as const).map((volume, i) => <Button key={volume} secondary={draft.musicVolume !== volume} title={['Très douce', 'Douce', 'Plus présente'][i]} onPress={() => setDraft({ ...draft, musicVolume: volume })} />)}</View>
     <MusicPreview volume={draft.musicVolume} />
-    <Text style={styles.heading}>Budget futur de l’IA</Text>
+    <Text style={styles.heading}>Votre budget souhaité</Text>
     <View style={styles.row}>{([5, 10] as const).map(budget => <Button key={budget} secondary={draft.monthlyBudget !== budget} title={`${budget} € / mois`} onPress={() => setDraft({ ...draft, monthlyBudget: budget })} />)}</View>
-    <Text style={styles.muted}>Service payant non activé. Cette préférence n’est pas encore un plafond de facturation serveur. Aucun appel IA ni TTS payant n’est effectué par cette version.</Text>
+    <Text style={styles.muted}>Cette préférence ne modifie pas le serveur. Le plafond effectif est celui du service familial, vérifié avant chaque création. Sans service connecté, aucun appel IA payant n’est effectué. La voix reste celle du téléphone.</Text>
     <Button title="Enregistrer la personnalisation" onPress={() => {
       const names = friendText.split(',').map(n => n.trim()).filter(Boolean);
       if (!cleanName(draft.hero) || names.length > 3 || names.some(n => !cleanName(n))) {

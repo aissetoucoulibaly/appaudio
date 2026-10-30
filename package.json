@@ -34,7 +34,11 @@
     "lint": "eslint .",
     "export:web": "expo export --platform web",
     "export:ios": "expo export --platform ios",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "server": "node --use-env-proxy --env-file=.env.server.local server/service.mjs",
+    "test:server": "node server/service.test.mjs",
+    "server:purge": "node --env-file=.env.server.local server/purge.mjs",
+    "server:setup": "node server/setup.mjs"
   },
   "private": true
 }

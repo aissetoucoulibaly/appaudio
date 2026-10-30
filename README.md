@@ -2,7 +2,11 @@
 
 Application Expo pour un essai accompagné, à 4 ans. Deux histoires originales intégrées (pompiers et police), personnages récurrents, prénom du héros, jusqu’à trois amis facultatifs, ambiance musicale originale réglable, voix françaises de l’appareil et autorisation parentale avant narration.
 
-**Cette version ne génère pas encore d’histoires par IA.** Les deux trames sont adaptées localement : le prénom remplace le personnage principal et les amis choisis participent à une introduction et une conclusion communes. Aucun compte, abonnement, clé API ou service analytique. Les prénoms restent dans le stockage local de l’app (non chiffré par l’application). Aucun envoi applicatif de récit à un fournisseur ; la synthèse vocale dépend des services système et de leurs réglages. Effacer les choix dans l’espace parent efface aussi les prénoms.
+**Édition du soir 0.3 :** nouvelle interface ivoire/indigo, typographie éditoriale et onglet Imaginer. Les demandes du soir peuvent être préparées avec des boutons et un détail libre facultatif, puis sauvegardées sur l’appareil. La création de nouveaux récits passe par un serveur familial à configurer ; elle reste indisponible sans compte API, modèle et tarifs renseignés. Voir [le guide du service familial](server/README.md). Un abonnement Claude ou ChatGPT ne suffit pas pour accéder à leurs API.
+
+Les histoires créées sont sauvegardées dans la bibliothèque et restent bloquées avant relecture parentale. Elles utilisent encore la voix du téléphone. La chaîne Anthropic et OpenAI est testée avec des fournisseurs simulés, pas avec un compte API réel.
+
+**Sans connexion au service familial, cette version ne génère pas de nouvelle histoire par IA.** Les deux trames sont adaptées localement : le prénom remplace le personnage principal et les amis choisis participent à une introduction et une conclusion communes. Aucun compte, abonnement, clé API ou service analytique. Les prénoms restent dans le stockage local de l’app (non chiffré par l’application). Pour les récits intégrés, aucun envoi applicatif de récit à un fournisseur ; la synthèse vocale dépend des services système et de leurs réglages. Effacer les données locales dans l’espace parent efface aussi les prénoms, idées et histoires créées de cet appareil, sans effacer les éventuelles copies serveur.
 
 ## Personnalisation et son
 
@@ -46,7 +50,7 @@ Le mode web sert à inspecter le parcours et peut utiliser la synthèse vocale d
 
 Sur iPhone, désactiver le mode silencieux et vérifier le volume. Les voix disponibles et leur qualité dépendent du système ; des ressources vocales peuvent devoir être téléchargées. La durée affichée est estimée et non mesurée sur un fichier.
 
-**Non fourni / non validé :** génération IA, fichier audio téléchargeable, commandes écran verrouillé, lecture de fond, publication App Store. Un vrai build iOS et des essais sur appareil seront nécessaires pour la prochaine étape audio. TestFlight nécessitera un abonnement Apple Developer ; un build local avec signature gratuite est parfois possible sur Mac, avec limitations.
+**Non fourni / non validé :** génération sur un compte fournisseur réel, fichier audio téléchargeable, commandes écran verrouillé, lecture de fond, publication App Store. Un vrai build iOS et des essais sur appareil seront nécessaires pour la prochaine étape audio. TestFlight nécessitera un abonnement Apple Developer ; un build local avec signature gratuite est parfois possible sur Mac, avec limitations.
 
 ## Vérifications
 

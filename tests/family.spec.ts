@@ -1,5 +1,13 @@
 import { expect, test, type Page } from '@playwright/test';
 
+test('modern home fits an iPhone viewport', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Imaginer l’histoire de ce soir' })).toBeVisible();
+  await expect(page.getByText('Édition du soir · 0.3')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({ path: '/tmp/appaudio-home-03.png' });
+});
+
 async function unlock(page: Page) {
   const prompt = await page.getByText(/Pour ouvrir cet espace, calculez/).innerText();
   const match = prompt.match(/(\d+)\s*\+\s*(\d+)/);
@@ -55,7 +63,7 @@ test('favorites persist, and parent reset removes both favorites and approvals',
   await expect(page.getByRole('button', { name: 'Retirer des favoris' })).toHaveCount(1);
   await page.getByRole('button', { name: 'Espace parent', exact: true }).click();
   await unlock(page);
-  await page.getByRole('button', { name: 'Effacer favoris et autorisations' }).click();
+  await page.getByRole('button', { name: 'Effacer les données locales' }).click();
   await page.getByRole('button', { name: 'Effacer', exact: true }).click();
   await expect(page.getByText('Les choix locaux ont été effacés.', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Bibliothèque' }).click();
@@ -117,4 +125,50 @@ test('music preview decodes the bundled track and advances without speech', asyn
   await expect.poll(() => page.locator('html').getAttribute('data-preview-time').then(t => Number(t || 0))).toBeGreaterThan(0.2);
   await page.getByRole('button', { name: 'Arrêter le test musical' }).click();
   await expect(page.getByRole('button', { name: 'Écouter la musique seule (6 secondes)' })).toBeVisible();
+});
+
+test('evening composer saves a guided idea without pretending to generate', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Imaginer l’histoire de ce soir' }).click();
+  await unlock(page);
+  await page.getByRole('button', { name: 'La police', exact: true }).click();
+  await page.getByRole('button', { name: 'Retrouver un voleur', exact: true }).click();
+  await page.getByRole('textbox', { name: 'Son idée pour l’histoire' }).fill('Un malfrat a caché le camion rouge.');
+  await page.getByRole('button', { name: 'Garder cette idée pour ce soir' }).click();
+  await expect(page.getByText('Votre idée est sauvegardée sur cet appareil.')).toBeVisible();
+  await expect(page.getByText('La création attend sa connexion')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Créer puis relire l’histoire' })).toHaveCount(0);
+  await page.reload();
+  await unlock(page);
+  await expect(page.getByRole('textbox', { name: 'Son idée pour l’histoire' })).toHaveValue('Un malfrat a caché le camion rouge.');
+});
+
+test('configured generation requires permission and quote, then parental review', async ({ page }) => {
+  await page.route('http://127.0.0.1:4180/health', route => route.fulfill({ json: { ready: true, provider: 'anthropic', budgetEuro: 5 } }));
+  await page.route('http://127.0.0.1:4180/estimate', route => route.fulfill({ json: { maximumEuro: 0.05, remainingEuro: 5, budgetEuro: 5 } }));
+  await page.route('http://127.0.0.1:4180/stories', route => route.fulfill({ json: { story: {
+    id: 'created-browser-test', title: 'Le mystère des biscuits', subtitle: 'Votre aventure du soir.', universe: 'fire', icon: '🚒', fixedCast: true,
+    paragraphs: ['Hugo vient au village avec son papa.', 'Les adultes retrouvent le panier.', 'La soirée se termine au calme.'],
+  } } }));
+  await page.goto('/parent');
+  await unlock(page);
+  await page.getByRole('textbox', { name: 'Prénom du héros' }).fill('Hugo');
+  await page.getByRole('button', { name: 'Enregistrer la personnalisation' }).click();
+  await page.getByRole('textbox', { name: 'Adresse du service familial' }).fill('http://127.0.0.1:4180');
+  await page.getByRole('textbox', { name: 'Jeton du service familial' }).fill('browser-test-token-not-real-1234567890');
+  await page.getByRole('button', { name: 'Connecter le service', exact: true }).click();
+  await expect(page.getByText(/Anthropic connecté pour cette session/)).toBeVisible();
+  await page.getByRole('button', { name: 'Imaginer', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Créer puis relire l’histoire' })).toBeDisabled();
+  await page.getByRole('button', { name: 'Autoriser l’envoi des prénoms et des idées' }).click();
+  await page.getByRole('button', { name: 'Vérifier le coût maximal' }).click();
+  await expect(page.getByText(/Au maximum 0.050/)).toBeVisible();
+  await page.getByRole('button', { name: 'Créer puis relire l’histoire' }).click();
+  await expect(page.getByText('Le mystère des biscuits', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Écouter l’histoire' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'J’ai lu ce récit et j’autorise son écoute' }).click();
+  await expect(page.getByRole('button', { name: 'Écouter l’histoire' })).toBeVisible();
+  await page.reload();
+  await expect(page.getByText('Le mystère des biscuits', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Écouter l’histoire' })).toBeVisible();
 });
