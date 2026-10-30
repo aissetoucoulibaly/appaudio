@@ -10,6 +10,12 @@ Dans **Espace parent**, enregistrer le prénom et les amis (séparés par des vi
 
 La musique est une nappe harmonique synthétisée originale de 24 secondes en boucle. Aucun échantillon tiers. Source reproductible : `python scripts/make-ambience.py`. Elle s’arrête avec la voix. Mélange voix/musique à vérifier sur le véritable iPhone, ainsi que les interruptions. Aucun accès au microphone n’est demandé par le projet.
 
+### Diagnostic musique — 0.2.1
+
+Le bloc « Musique douce » affiche « Version musique 0.2.1 ». Le bouton « Écouter la musique seule (6 secondes) » joue un extrait sans narration, au niveau sélectionné, sans sauvegarde préalable. Il peut être arrêté immédiatement. Pour le récit, choisir « Avec musique », le niveau souhaité, puis enregistrer la personnalisation. La piste utilise désormais des notes plus audibles sur le haut-parleur du téléphone et une attaque courte ; la session audio est explicitement activée avant le récit. La correction doit encore être confirmée sur un véritable iPhone.
+
+Un test navigateur décode et lit réellement le WAV et vérifie la progression du temps, contrairement aux tests de coordination voix/musique qui simulent la lecture. Aucun de ces tests ne garantit le volume perçu ou le mixage sur iOS.
+
 Le budget de 5 € (ou 10 € maximum) est pour l’instant une préférence locale pour le futur service. **Ce n’est pas un contrôle de facturation serveur.** Aucun appel payant n’est effectué. L’activation future exigera des tarifs vérifiés, une réservation de budget atomique côté serveur, un plafond fournisseur, un consentement au transfert des prénoms et un stockage audio permettant la réécoute sans resynthèse.
 
 ## Démarrer

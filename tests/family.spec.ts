@@ -100,3 +100,21 @@ test('parent configures names; choosing a friend revokes approval and persists t
   await page.getByRole('button', { name: 'Sans les amis', exact: true }).click();
   await expect(page.getByText(/Aujourd’hui, Hugo retrouve Zoé/)).toHaveCount(0);
 });
+
+test('music preview decodes the bundled track and advances without speech', async ({ page }) => {
+  await page.addInitScript(() => {
+    const original = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function () {
+      this.addEventListener('timeupdate', () => { document.documentElement.dataset.previewTime = String(this.currentTime); });
+      return original.call(this);
+    };
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Espace parent', exact: true }).click();
+  await unlock(page);
+  await page.getByRole('button', { name: 'Écouter la musique seule (6 secondes)' }).click();
+  await expect(page.getByRole('button', { name: 'Arrêter le test musical' })).toBeVisible();
+  await expect.poll(() => page.locator('html').getAttribute('data-preview-time').then(t => Number(t || 0))).toBeGreaterThan(0.2);
+  await page.getByRole('button', { name: 'Arrêter le test musical' }).click();
+  await expect(page.getByRole('button', { name: 'Écouter la musique seule (6 secondes)' })).toBeVisible();
+});

@@ -4,6 +4,7 @@ import * as Speech from 'expo-speech';
 import { cleanName } from '../content/personalization';
 import { useLibrary } from '../state/Library';
 import { Button, Card, colors, styles } from './ui';
+import { MusicPreview } from './MusicPreview';
 
 export function FamilySettings() {
   const library = useLibrary();
@@ -31,8 +32,10 @@ export function FamilySettings() {
       void Speech.stop().then(() => Speech.speak(`Bonjour ${hero}. Une petite aventure nous attend au village des Tilleuls.`, { language: 'fr-FR', voice: draft.voice || undefined, rate: 0.9 }));
     }} />
     <Text style={styles.heading}>Musique douce</Text>
+    <Text style={styles.muted}>Version musique 0.2.1 · Testez la musique seule au volume choisi, puis enregistrez les réglages.</Text>
     <View style={styles.row}><Button secondary={!draft.music} title="Avec musique" onPress={() => setDraft({ ...draft, music: true })} /><Button secondary={draft.music} title="Sans musique" onPress={() => setDraft({ ...draft, music: false })} /></View>
     <View style={styles.row}>{([0.06, 0.12, 0.2] as const).map((volume, i) => <Button key={volume} secondary={draft.musicVolume !== volume} title={['Très douce', 'Douce', 'Plus présente'][i]} onPress={() => setDraft({ ...draft, musicVolume: volume })} />)}</View>
+    <MusicPreview volume={draft.musicVolume} />
     <Text style={styles.heading}>Budget futur de l’IA</Text>
     <View style={styles.row}>{([5, 10] as const).map(budget => <Button key={budget} secondary={draft.monthlyBudget !== budget} title={`${budget} € / mois`} onPress={() => setDraft({ ...draft, monthlyBudget: budget })} />)}</View>
     <Text style={styles.muted}>Service payant non activé. Cette préférence n’est pas encore un plafond de facturation serveur. Aucun appel IA ni TTS payant n’est effectué par cette version.</Text>

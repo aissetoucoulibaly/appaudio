@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
-import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
+import { setAudioModeAsync, setIsAudioActiveAsync, useAudioPlayer } from 'expo-audio';
 import { AppState, Text } from 'react-native';
 import { approvalVersion, stories } from '../../content/stories';
 import { ParentGate } from '../../components/ParentGate';
@@ -14,7 +14,7 @@ export default function StoryScreen() {
   const library = useLibrary();
   const baseStory = stories.find(s => s.id === id);
   const story = baseStory ? personalize(baseStory, library.settings) : undefined;
-  const music = useAudioPlayer(require('../../../assets/tilleuls-ambience.wav'));
+  const music = useAudioPlayer(require('../../../assets/tilleuls-ambience.wav'), { keepAudioSessionActive: true });
   const [position, setPosition] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [error, setError] = useState('');
@@ -50,7 +50,10 @@ export default function StoryScreen() {
     await Speech.stop();
     if (run !== generation.current) return;
     setError('');
-    try { await setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'mixWithOthers', shouldPlayInBackground: false }); }
+    try {
+      await setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'mixWithOthers', shouldPlayInBackground: false });
+      await setIsAudioActiveAsync(true);
+    }
     catch { setError('Le réglage audio est indisponible. La musique peut ne pas se mélanger à la voix sur cet appareil.'); }
     if (run !== generation.current) return;
     setPlaying(true);
